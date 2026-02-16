@@ -1,0 +1,80 @@
+﻿@page "/employees/delete/{UserId}"
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Delete Employee</PageTitle>
+
+<div class="row">
+    <div class="col-md-4 m-auto">
+        @if (_user is null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <h1>Delete Employee</h1>
+            <p text-muted>Are you sure you want to delete this user?</p>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3">Email</dt>
+                        <dd class="col-sm-9">@_user.Email</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <form method="post" @formname="deleteEmployee" @onsubmit="DeleteUser">
+                <Button Color="ButtonColor.Secondary" @onclick="Home">Cancel</Button>
+                <AntiforgeryToken/>
+                <Button Type="ButtonType.Submit" Color="ButtonColor.Danger" disabled="@_isDeleting">
+                    @(_isDeleting ? "Deleting..." : "Delete")
+                </Button>
+            </form>
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <p class="text-danger mt-2">@_errorMessage</p>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string UserId { get; set; } = default!;
+
+    private ApplicationUser? _user;
+    private bool _isDeleting;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await UserManager.FindByIdAsync(UserId);
+    }
+
+    private async Task DeleteUser()
+    {
+        if (_user is null) return;
+
+        _isDeleting = true;
+
+        var result = await UserManager.DeleteAsync(_user);
+
+        if (result.Succeeded)
+        {
+            NavigationManager.NavigateTo("/employees?deleted=1");
+        }
+        else
+        {
+            _errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
+            _isDeleting = false;
+        }
+    }
+
+    private void Home()
+    {
+        NavigationManager.NavigateTo("/employees");
+    }
+
+}

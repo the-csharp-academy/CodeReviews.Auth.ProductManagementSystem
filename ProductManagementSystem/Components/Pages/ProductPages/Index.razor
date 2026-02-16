@@ -1,0 +1,332 @@
+﻿@page "/products"
+@using ProductManagementSystem.Services.Products
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@rendermode InteractiveServer
+
+<PageTitle>Products</PageTitle>
+
+<Toasts Messages="_messages" AutoHide="true" Delay="5000" Placement="ToastsPlacement.TopRight"/>
+
+@if (_isLoading)
+{
+    <div class="position-absolute w-75 h-75 d-flex flex-column align-items-center bg-white justify-content-center">
+        <img src="images/loading.gif" alt="loading"/>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+
+        @if (_isManagerOrAdmin)
+        {
+            <div class="row align-items-center justify-content-between g-2 mb-3">
+                <div class="col-md-3">
+                    <ProductCard Title="Total Items" IconClass="bi bi-box-seam" Count=@_totalItems
+                                 ShortDescription="Across all locations"/>
+                </div>
+                <div class="col-md-3">
+                    <ProductCard Title="Low Stock Items" IconClass="bi bi-exclamation-triangle"
+                                 Count=@_totalLowStockItems
+                                 ShortDescription="Require restocking"/>
+                </div>
+                <div class="col-md-3">
+                    <ProductCard Title="Total Value" IconClass="bi bi-graph-up-arrow" Count=@($"${_totalPrice}")
+                                 ShortDescription="Current inventory value"/>
+                </div>
+                <div class="col-md-3">
+                    <ProductCard Title="Categories" IconClass="bi bi-tags" Count=@_categoryCount
+                                 ShortDescription="Product categories"/>
+                </div>
+            </div>
+        }
+
+        <div class="row align-items-center justify-content-end g-2 mb-3">
+            <div class="col-auto">
+                <Button Color="ButtonColor.Info" Outline="true" @onclick=ShowContent><i class="bi bi-filter"></i>
+                </Button>
+            </div>
+            <div class="col-auto page-size-chooser d-flex align-items-center">
+                <label class="me-2 mb-0">Items per page:</label>
+                <select class="form-select form-select-sm" style="width: auto;" @bind="_pagination.ItemsPerPage">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+            @if (_isManagerOrAdmin)
+            {
+                <div class="col-auto">
+                    <Button Color="ButtonColor.Secondary" Outline="true" @onclick="Create">Add Product</Button>
+                </div>
+            }
+        </div>
+
+        @if (_showContent)
+        {
+            <div class="row align-items-center justify-content-between g-2 mb-3">
+                <div class="col-3 search-box">
+                    <label>Search by Name</label>
+                    <input class="form-control" type="search" autofocus @bind="_nameSearch"
+                           @bind:event="oninput"
+                           @bind:after="OnFilterChanged"
+                           placeholder="Search by name.."/>
+                </div>
+                <div class="col-3 search-box">
+                    <label>Search by Category</label>
+                    <input class="form-control" type="search" autofocus @bind="_categorySearch"
+                           @bind:event="oninput"
+                           @bind:after="OnFilterChanged"
+                           placeholder="Search by category.."/>
+                </div>
+                <div class="col-2 search-box">
+                    <label>Filter by Start Date</label>
+                    <input class="form-control" type="datetime-local" @bind="_startDate" @bind:event="oninput"
+                           @bind:after="OnFilterChanged"
+                           placeholder="Start"/>
+                </div>
+                <div class="col-2 search-box">
+                    <label>Filter by End Date</label>
+                    <input class="form-control" type="datetime-local" @bind="_endDate" @bind:event="oninput"
+                           @bind:after="OnFilterChanged"
+                           placeholder="End"/>
+                </div>
+                <div class="col-1 search-box">
+                    <label>Is Active?</label>
+                    <select class="form-select"
+                            @bind="_isActiveFilterValue"
+                            @bind:after="OnFilterChanged">
+                        <option value="">All</option>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-1">
+                    <label>Clear Filters</label>
+                    <Button Color="ButtonColor.Secondary" Outline="true" @onclick="ClearFilters">
+                        <i class="bi bi-x-circle"></i>
+                    </Button>
+                </div>
+            </div>
+        }
+
+        <QuickGrid Items="FilteredProducts" ItemKey="p => p.Id" Pagination="@_pagination" Theme="none"
+                   Class="table table-hover">
+            <PropertyColumn Property="@(p => p.ProductName)" Title="Product Name" Sortable="true" Align="Align.Center"
+                            IsDefaultSortColumn="true"/>
+            <PropertyColumn Property="@(p => p.Sku)" Title="SKU" Sortable="true" Align="Align.Center"></PropertyColumn>
+            <PropertyColumn Property="@(p => p.Category)" Sortable="true" Align="Align.Center"/>
+            @if (_isManagerOrAdmin)
+            {
+                <PropertyColumn Property="@(p => p.Price)" Sortable="true" Align="Align.Center"/>
+            }
+            <PropertyColumn Property="@(p => p.Quantity)" Sortable="true" Align="Align.Center"/>
+            <PropertyColumn Property="@(p => p.Location)" Sortable="true" Align="Align.Center"/>
+            <PropertyColumn Property="@(p => p.DateAdded)" Title="Date Added" Format="MM-dd-yyyy"
+                            Align="Align.Center"/>
+            <TemplateColumn Title="Status" Align="Align.Center">
+                <div class="@(GetStatusClass(context.Status))">
+                    @(context.Status.GetDisplayName() ?? context.Status.ToString())
+                </div>
+            </TemplateColumn>
+            <TemplateColumn Title="Is Active?" Align="Align.Center">
+                <input class="form-check-input" type="checkbox" checked="@context.IsActive" disabled/>
+            </TemplateColumn>
+            @if (_isManagerOrAdmin)
+            {
+                <TemplateColumn Title="Actions" Context="product" Align="Align.Center">
+                    <Button Color="ButtonColor.Primary" Outline="true" @onclick="() => Edit(product.Id)">
+                        <i
+                            class="bi bi-pencil-square"></i></Button>
+                    <Button Color="ButtonColor.Danger" Outline="true" @onclick="() => Delete(product.Id)">
+                        <i
+                            class="bi bi-trash3"></i>
+                    </Button>
+                </TemplateColumn>
+            }
+        </QuickGrid>
+    </div>
+    <div>
+        <Paginator State="_pagination"/>
+    </div>
+}
+
+@code {
+
+    [SupplyParameterFromQuery(Name = "created")]
+    public int? Created { get; set; }
+
+    [SupplyParameterFromQuery(Name = "deleted")]
+    public int? Deleted { get; set; }
+
+    [SupplyParameterFromQuery(Name = "updated")]
+    public int? Updated { get; set; }
+
+    private bool _shouldCleanUrl;
+    private readonly List<ToastMessage> _messages = [];
+    private bool _isLoading = true;
+    private bool _showContent;
+    private bool _isManagerOrAdmin;
+    private string _isActiveFilterValue = "";
+    private QuickGrid<ProductResponse> productGrid;
+    readonly PaginationState _pagination = new() { ItemsPerPage = 10 };
+    private string _nameSearch = string.Empty;
+    private string _categorySearch = string.Empty;
+    private DateTime? _startDate = DateTime.MinValue;
+    private DateTime? _endDate = DateTime.MaxValue;
+    private List<ProductResponse> _allProducts = [];
+    private string? _totalItems;
+    private string? _totalLowStockItems;
+    private string? _totalPrice;
+    private string? _categoryCount;
+
+    private IQueryable<ProductResponse> FilteredProducts => _allProducts
+        .Where(p => (p.ProductName ?? "").Contains(_nameSearch, StringComparison.OrdinalIgnoreCase))
+        .Where(p => (p.Category ?? "").Contains(_categorySearch, StringComparison.OrdinalIgnoreCase))
+        .Where(p =>
+            (!_startDate.HasValue || p.DateAdded >= _startDate.Value) &&
+            (!_endDate.HasValue || p.DateAdded <= _endDate.Value))
+        .Where(p => !IsActiveFilter.HasValue || p.IsActive == IsActiveFilter.Value)
+        .AsQueryable();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Created == 1)
+        {
+            _messages.Add(new ToastMessage
+            {
+                Type = ToastType.Success,
+                Title = "Product Added",
+                HelpText = $"{DateTime.Now}",
+                Message = $"Product added successfully! DateTime: {DateTime.Now}"
+            });
+
+            Created = null;
+            _shouldCleanUrl = true;
+        }
+
+        if (Deleted == 1)
+        {
+            _messages.Add(new ToastMessage
+            {
+                Type = ToastType.Success,
+                Title = "Product Deleted",
+                HelpText = $"{DateTime.Now}",
+                Message = $"Product deleted successfully! DateTime: {DateTime.Now}"
+            });
+            Deleted = null;
+            _shouldCleanUrl = true;
+        }
+
+        if (Updated == 1)
+        {
+            _messages.Add(new ToastMessage
+            {
+                Type = ToastType.Success,
+                Title = "Product Updated",
+                HelpText = $"{DateTime.Now}",
+                Message = $"Product updated successfully! DateTime: {DateTime.Now}"
+            });
+            Deleted = null;
+            _shouldCleanUrl = true;
+        }
+
+        _allProducts = await LoadProducts();
+
+        _startDate = _allProducts.Min(p => p.DateAdded);
+        _endDate = _allProducts.Max(p => p.DateAdded);
+
+        _totalItems = _allProducts.Sum(p => p.Quantity).ToString();
+        _totalPrice = _allProducts.Sum(p => (p.Price ?? 0) * (p.Quantity ?? 0)).ToString("N2");
+        _totalLowStockItems = _allProducts.Count(p => (p.Quantity ?? 0) <= 10).ToString();
+        _categoryCount = _allProducts.Select(p => p.Category).Distinct().Count().ToString();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            if (user.IsInRole("Admin") || user.IsInRole("Manager"))
+            {
+                _isManagerOrAdmin = true;
+            }
+        }
+
+        _isLoading = false;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!_shouldCleanUrl) return;
+
+        _shouldCleanUrl = false;
+        NavigationManager.NavigateTo("/products", replace: true);
+    }
+
+    private async Task<List<ProductResponse>> LoadProducts()
+    {
+        return await ProductService.GetAllProductsAsync();
+    }
+
+    private void ShowContent()
+    {
+        _showContent = !_showContent;
+    }
+
+    private string GetStatusClass(StockStatus status)
+    {
+        if (status == StockStatus.OutOfStock)
+            return "out-of-stock";
+        return status == StockStatus.LowStock ? "low-stock" : "in-stock";
+    }
+
+    private async Task OnFilterChanged()
+    {
+        await _pagination.SetCurrentPageIndexAsync(0);
+    }
+
+    private void Edit(object productId)
+    {
+        NavigationManager.NavigateTo($"/products/edit/{productId}");
+    }
+
+    private void Delete(object productId)
+    {
+        NavigationManager.NavigateTo($"/products/delete/{productId}");
+    }
+
+    private void Create()
+    {
+        NavigationManager.NavigateTo("/products/create");
+    }
+
+    private bool? IsActiveFilter => _isActiveFilterValue switch
+    {
+        "true" => true,
+        "false" => false,
+        _ => null
+    };
+
+    private async Task ClearFilters()
+    {
+        _nameSearch = string.Empty;
+        _categorySearch = string.Empty;
+        _isActiveFilterValue = "";
+
+        if (_allProducts.Count > 0)
+        {
+            _startDate = _allProducts.Min(p => p.DateAdded);
+            _endDate = _allProducts.Max(p => p.DateAdded);
+        }
+        else
+        {
+            _startDate = DateTime.MinValue;
+            _endDate = DateTime.MaxValue;
+        }
+
+        await _pagination.SetCurrentPageIndexAsync(0);
+    }
+
+}

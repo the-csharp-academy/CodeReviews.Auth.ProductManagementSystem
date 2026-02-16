@@ -1,0 +1,5 @@
+<Solution>
+    <Project Path="ProductManagementSystem.IntegrationTests/ProductManagementSystem.IntegrationTests.csproj"/>
+    <Project Path="ProductManagementSystem.UnitTests/ProductManagementSystem.UnitTests.csproj"/>
+    <Project Path="ProductManagementSystem/ProductManagementSystem.csproj"/>
+</Solution>

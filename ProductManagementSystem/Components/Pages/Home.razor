@@ -1,0 +1,110 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<div class="home-page">
+    <div class="home-hero">
+        <div class="home-hero__inner">
+            <div class="home-hero__copy">
+                <span class="home-kicker">Product Management System</span>
+
+                <h1 class="home-title">
+                    Manage products, inventory, and employees — cleanly and confidently.
+                </h1>
+
+                <p class="home-subtitle">
+                    This Blazor app brings your day-to-day operations into one place: track product availability,
+                    keep stock status visible at a glance, and manage employee-related workflows with a modern UI.
+                </p>
+
+                <div class="home-cta">
+                    <a class="btn btn-primary btn-lg" href="/Account/Login">
+                        Log in
+                    </a>
+                    <a class="btn btn-outline-secondary btn-lg" href="/Account/Register">
+                        Create account
+                    </a>
+                </div>
+
+                <div class="home-note">
+                    New here? Register first, then log in to access the management pages.
+                </div>
+            </div>
+
+            <div class="home-hero__panel" aria-hidden="true">
+                <div class="home-panel-card">
+                    <div class="home-panel-card__title">Quick overview</div>
+                    <div class="home-panel-card__list">
+                        <div class="home-panel-item">
+                            <div class="home-dot home-dot--ok"></div>
+                            <div>
+                                <div class="home-panel-item__label">In stock</div>
+                                <div class="home-panel-item__desc">Items available for immediate use/sale</div>
+                            </div>
+                        </div>
+
+                        <div class="home-panel-item">
+                            <div class="home-dot home-dot--warn"></div>
+                            <div>
+                                <div class="home-panel-item__label">Low stock</div>
+                                <div class="home-panel-item__desc">Time to reorder soon</div>
+                            </div>
+                        </div>
+
+                        <div class="home-panel-item">
+                            <div class="home-dot home-dot--bad"></div>
+                            <div>
+                                <div class="home-panel-item__label">Out of stock</div>
+                                <div class="home-panel-item__desc">Not currently available</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="home-panel-glow"></div>
+            </div>
+        </div>
+    </div>
+
+    <section class="home-section">
+        <div class="home-grid">
+            <div class="home-card">
+                <h2 class="home-card__title">What this project does</h2>
+                <p class="home-card__text">
+                    Centralizes key operational data so you can view, update, and maintain product information and stock
+                    status while keeping employee workflows organized.
+                </p>
+            </div>
+
+            <div class="home-card">
+                <h2 class="home-card__title">How to get started</h2>
+                <ol class="home-steps">
+                    <li>
+                        <strong>Register</strong> an account at
+                        <a href="/Account/Register">/Account/Register</a>.
+                    </li>
+                    <li>
+                        <strong>Log in</strong> at
+                        <a href="/Account/Login">/Account/Login</a>.
+                    </li>
+                    <li>
+                        After signing in, use the navigation menu to open the management pages.
+                    </li>
+                </ol>
+                <div class="home-mini-cta">
+                    <a class="btn btn-primary" href="/Account/Login">Log in</a>
+                    <a class="btn btn-link" href="/Account/Register">Need an account?</a>
+                </div>
+            </div>
+
+            <div class="home-card">
+                <h2 class="home-card__title">Why you’ll like it</h2>
+                <ul class="home-bullets">
+                    <li>Modern, readable layout with clear calls to action</li>
+                    <li>Stock status designed to be obvious at a glance</li>
+                    <li>Fast navigation and a focused workflow</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>

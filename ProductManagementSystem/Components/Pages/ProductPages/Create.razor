@@ -1,0 +1,86 @@
+@page "/products/create"
+@using ProductManagementSystem.Services.Products
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Add Product</PageTitle>
+
+
+<div class="row">
+    <div class="col-md-4 m-auto">
+        <h1>Add Product</h1>
+        <EditForm Model="ProductAddRequest" OnValidSubmit="AddProduct">
+            <DataAnnotationsValidator/>
+            <ValidationSummary role="alert"/>
+
+            <div class="mb-3">
+                <label for="productName" class="form-label">Name:</label>
+                <InputText id="productName" @bind-Value="ProductAddRequest.ProductName" class="form-control"/>
+                <ValidationMessage For="() => ProductAddRequest.ProductName" class="text-danger"/>
+            </div>
+
+            <div class="mb-3">
+                <label for="productSku" class="form-label">SKU:</label>
+                <InputText id="productSku" @bind-Value="ProductAddRequest.Sku" class="form-control"/>
+                <ValidationMessage For="() => ProductAddRequest.Sku" class="text-danger"/>
+            </div>
+
+            <div class="mb-3">
+                <label for="category" class="form-label">Category:</label>
+                <InputText id="category" @bind-Value="ProductAddRequest.Category" class="form-control"/>
+                <ValidationMessage For="() => ProductAddRequest.Category" class="text-danger"/>
+            </div>
+
+            <div class="mb-3">
+                <label for="price" class="form-label">Price:</label>
+                <InputNumber id="price" @bind-Value="ProductAddRequest.Price" class="form-control"/>
+                <ValidationMessage For="() => ProductAddRequest.Price" class="text-danger"/>
+            </div>
+
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity:</label>
+                <InputNumber id="quantity" @bind-Value="ProductAddRequest.Quantity" class="form-control"/>
+                <ValidationMessage For="() => ProductAddRequest.Quantity" class="text-danger"/>
+            </div>
+
+            <div class="mb-3">
+                <label for="productLocation" class="form-label">Location:</label>
+                <InputText id="productLocation" @bind-Value="ProductAddRequest.Location" class="form-control"/>
+                <ValidationMessage For="() => ProductAddRequest.Location" class="text-danger"/>
+            </div>
+
+            <div class="mb-3">
+                <label for="isActive" class="form-label">Is Active?:</label>
+                <InputCheckbox id="isActive" @bind-Value="ProductAddRequest.IsActive" class="form-check-input"/>
+                <ValidationMessage For="() => ProductAddRequest.IsActive" class="text-danger"/>
+            </div>
+
+            <Button Color="ButtonColor.Secondary" @onclick="Home">Cancel</Button>
+            <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Add</Button>
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+    [SupplyParameterFromForm] public ProductAddRequest ProductAddRequest { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductAddRequest = new ProductAddRequest { DateAdded = DateTime.Now };
+    }
+
+    private async Task AddProduct()
+    {
+        await ProductService.AddProductAsync(ProductAddRequest);
+
+        NavigationManager.NavigateTo("/products?created=1");
+    }
+
+    private void Home()
+    {
+        NavigationManager.NavigateTo("/products");
+    }
+
+}

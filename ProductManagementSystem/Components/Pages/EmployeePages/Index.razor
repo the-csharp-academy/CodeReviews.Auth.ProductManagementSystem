@@ -1,0 +1,151 @@
+﻿@page "/employees"
+@inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+
+<PageTitle>Employees</PageTitle>
+
+<Toasts Messages="_messages" AutoHide="true" Delay="5000" Placement="ToastsPlacement.TopRight"/>
+
+@if (Users is null)
+{
+    <div class="position-absolute w-75 h-75 d-flex flex-column align-items-center bg-white justify-content-center">
+        <img src="images/loading.gif" alt="loading"/>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row align-items-center justify-content-end g-2 mb-3">
+            <div class="col-auto">
+                <Button Color="ButtonColor.Secondary" Outline="true" @onclick="Create">Add Employee</Button>
+            </div>
+        </div>
+
+        <QuickGrid Items="AllUsers" ItemKey="u => u.Id" Pagination="@_pagination" Theme="none"
+                   Class="table table-hover">
+            <PropertyColumn Property="u => u.UserName" Align="Align.Center" Title="Username"/>
+            <TemplateColumn Title="Role" Context="u" Align="Align.Center">
+                @GetRolesText(u.Id)
+            </TemplateColumn>
+            <PropertyColumn Property="u => u.Email" Align="Align.Center"/>
+            <TemplateColumn Align="Align.Center" Title="Email Confirmed?">
+                <input class="form-check-input" type="checkbox" checked="@context.EmailConfirmed" disabled/>
+            </TemplateColumn>
+            <TemplateColumn Title="Actions" Context="u" Align="Align.Center">
+                <button class="btn btn-outline-primary" @onclick="() => Edit(u.Id)"><i
+                        class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn btn-outline-danger" @onclick="() => Delete(u.Id)"><i class="bi bi-trash3"></i>
+                </button>
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+
+    <div>
+        <Paginator State="_pagination"/>
+    </div>
+}
+
+@code {
+
+    [SupplyParameterFromQuery(Name = "created")]
+    public int? Created { get; set; }
+
+    [SupplyParameterFromQuery(Name = "deleted")]
+    public int? Deleted { get; set; }
+
+    [SupplyParameterFromQuery(Name = "updated")]
+    public int? Updated { get; set; }
+
+    private bool _shouldCleanUrl;
+    private readonly List<ToastMessage> _messages = [];
+    readonly PaginationState _pagination = new() { ItemsPerPage = 10 };
+    private List<ApplicationUser>? Users { get; set; }
+    private IQueryable<ApplicationUser> AllUsers => Users.AsQueryable();
+    private readonly Dictionary<string, IList<string>> _rolesByUserId = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Created == 1)
+        {
+            _messages.Add(new ToastMessage
+            {
+                Type = ToastType.Success,
+                Title = "Employee Added",
+                HelpText = $"{DateTime.Now}",
+                Message = $"Employee added successfully! DateTime: {DateTime.Now}"
+            });
+
+            Created = null;
+            _shouldCleanUrl = true;
+        }
+
+        if (Deleted == 1)
+        {
+            _messages.Add(new ToastMessage
+            {
+                Type = ToastType.Success,
+                Title = "Employee Deleted",
+                HelpText = $"{DateTime.Now}",
+                Message = $"Employee deleted successfully! DateTime: {DateTime.Now}"
+            });
+            Deleted = null;
+            _shouldCleanUrl = true;
+        }
+
+        if (Updated == 1)
+        {
+            _messages.Add(new ToastMessage
+            {
+                Type = ToastType.Success,
+                Title = "Employee Updated",
+                HelpText = $"{DateTime.Now}",
+                Message = $"Employee updated successfully! DateTime: {DateTime.Now}"
+            });
+            Deleted = null;
+            _shouldCleanUrl = true;
+        }
+
+        Users = await UserManager.Users.ToListAsync();
+
+        foreach (var user in Users)
+        {
+            var roles = await UserManager.GetRolesAsync(user);
+            _rolesByUserId[user.Id] = roles;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_shouldCleanUrl)
+        {
+            _shouldCleanUrl = false;
+            NavigationManager.NavigateTo("/employees", replace: true);
+        }
+    }
+
+    private string GetRolesText(string userId)
+    {
+        return _rolesByUserId.TryGetValue(userId, out var roles) && roles.Count > 0
+            ? string.Join(", ", roles)
+            : "(none)";
+    }
+
+    private void Create()
+    {
+        NavigationManager.NavigateTo("/employees/create");
+    }
+
+    private void Edit(object userId)
+    {
+        NavigationManager.NavigateTo($"/employees/edit/{userId}");
+    }
+
+    private void Delete(object userId)
+    {
+        NavigationManager.NavigateTo($"/employees/delete/{userId}");
+    }
+
+}

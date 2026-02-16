@@ -1,0 +1,25 @@
+﻿<div class="card">
+    <div class="card-body">
+        <div class="d-flex mb-3">
+            <div class="d-flex justify-content-between align-items-center w-100 mb-3">
+                <h4 class="card-title mb-0">@Title</h4>
+                @if (!string.IsNullOrWhiteSpace(IconClass))
+                {
+                    <i class="@IconClass"></i>
+                }
+            </div>
+        </div>
+        <h2 class="mb-0">@Count</h2>
+        @if (!string.IsNullOrWhiteSpace(ShortDescription))
+        {
+            <p class="card-text text-muted">@ShortDescription</p>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Count { get; set; } = "0";
+    [Parameter] public string ShortDescription { get; set; } = string.Empty;
+    [Parameter] public string IconClass { get; set; } = string.Empty;
+}

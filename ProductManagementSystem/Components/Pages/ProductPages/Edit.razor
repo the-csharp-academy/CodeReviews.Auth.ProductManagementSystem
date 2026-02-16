@@ -1,0 +1,127 @@
+@page "/products/edit/{ProductId:int}"
+@using ProductManagementSystem.Services.Products
+@inject NavigationManager NavigationManager
+@inject IProductService ProductService
+@rendermode InteractiveServer
+
+<PageTitle>Update Product</PageTitle>
+
+<div class="row">
+    <div class="col-md-4 m-auto">
+        @if (Product is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <h1>Update Product</h1>
+            <EditForm Model="ProductUpdateRequest" OnValidSubmit="UpdateProduct">
+                <DataAnnotationsValidator/>
+                <ValidationSummary role="alert"/>
+
+                <div class="mb-3">
+                    <label for="productName" class="form-label">Name:</label>
+                    <InputText id="productName" @bind-Value="ProductUpdateRequest.ProductName" class="form-control"/>
+                    <ValidationMessage For="() => ProductUpdateRequest.ProductName" class="text-danger"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="productSku" class="form-label">SKU:</label>
+                    <InputText id="productSku" @bind-Value="ProductUpdateRequest.Sku" class="form-control"/>
+                    <ValidationMessage For="() => ProductUpdateRequest.Sku" class="text-danger"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category:</label>
+                    <InputText id="category" @bind-Value="ProductUpdateRequest.Category" class="form-control"/>
+                    <ValidationMessage For="() => ProductUpdateRequest.Category" class="text-danger"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <InputNumber id="price" @bind-Value="ProductUpdateRequest.Price" class="form-control"/>
+                    <ValidationMessage For="() => ProductUpdateRequest.Price" class="text-danger"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <InputNumber id="quantity" @bind-Value="ProductUpdateRequest.Quantity" class="form-control"/>
+                    <ValidationMessage For="() => ProductUpdateRequest.Quantity" class="text-danger"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dateAdded" class="form-label">Date Added:</label>
+                    <InputDate id="dateAdded" @bind-Value="ProductUpdateRequest.DateAdded" class="form-control"/>
+                    <ValidationMessage For="() => ProductUpdateRequest.DateAdded" class="text-danger"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="productLocation" class="form-label">Location:</label>
+                    <InputText id="productLocation" @bind-Value="ProductUpdateRequest.Location" class="form-control"/>
+                    <ValidationMessage For="() => ProductUpdateRequest.Location" class="text-danger"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="isActive" class="form-label">Is Active?:</label>
+                    <InputCheckbox id="isActive" @bind-Value="ProductUpdateRequest.IsActive" class="form-check-input"/>
+                    <ValidationMessage For="() => ProductUpdateRequest.IsActive" class="text-danger"/>
+                </div>
+
+                <Button Color="ButtonColor.Secondary" @onclick="Home">Cancel</Button>
+                <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
+            </EditForm>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public int? ProductId { get; set; }
+
+    private ProductResponse? Product { get; set; }
+
+    [SupplyParameterFromForm] public ProductUpdateRequest? ProductUpdateRequest { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Product = await ProductService.GetProductAsync(ProductId);
+
+        if (Product is null)
+        {
+            NavigationManager.NotFound();
+        }
+
+        if (Product != null)
+            ProductUpdateRequest = new ProductUpdateRequest
+            {
+                Id = Product.Id,
+                ProductName = Product.ProductName,
+                Sku = Product.Sku,
+                Category = Product.Category,
+                Price = Product.Price,
+                Quantity = Product.Quantity,
+                DateAdded = Product.DateAdded,
+                Location = Product.Location,
+                IsActive = Product.IsActive
+            };
+    }
+
+    private async Task UpdateProduct()
+    {
+        if (ProductUpdateRequest is null)
+        {
+            NavigationManager.NotFound();
+            return;
+        }
+
+        await ProductService.UpdateProductAsync(ProductUpdateRequest);
+
+        NavigationManager.NavigateTo("/products?updated=1");
+    }
+
+    private void Home()
+    {
+        NavigationManager.NavigateTo("/products");
+    }
+
+}

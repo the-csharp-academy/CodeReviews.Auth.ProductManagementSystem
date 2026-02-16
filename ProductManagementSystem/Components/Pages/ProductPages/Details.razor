@@ -1,0 +1,82 @@
+@page "/products/details/{ProductId:int}"
+@using ProductManagementSystem.Services.Products
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Details</PageTitle>
+
+
+<div class="row">
+    <div class="col-md-4 m-auto">
+        @if (Product is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <h1>Product Details</h1>
+            <p class="text-muted">Viewing information for this product.</p>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">@Product.ProductName</dd>
+
+                        <dt class="col-sm-4">SKU</dt>
+                        <dd class="col-sm-8">@Product.Sku</dd>
+
+                        <dt class="col-sm-4">Category</dt>
+                        <dd class="col-sm-8">@Product.Category</dd>
+
+                        <dt class="col-sm-4">Price</dt>
+                        <dd class="col-sm-8">@Product.Price</dd>
+
+                        <dt class="col-sm-4">Quantity</dt>
+                        <dd class="col-sm-8">@Product.Quantity</dd>
+
+                        <dt class="col-sm-4">Date Added</dt>
+                        <dd class="col-sm-8">@Product.DateAdded</dd>
+
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">@Product.Location</dd>
+
+                        <dt class="col-sm-4">Is Active?</dt>
+                        <dd class="col-sm-8">@(Product.IsActive ? "Yes" : "No")</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div>
+                <button type="button" class="btn btn-outline-primary" @onclick="() => Edit(Product.Id)">Edit</button>
+                <button type="button" class="btn btn-secondary ms-2" @onclick="Home">Cancel</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? ProductId { get; set; }
+
+    private ProductResponse? Product { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ProductId is not null)
+        {
+            Product = await ProductService.GetProductAsync(ProductId.Value);
+        }
+    }
+
+    private void Edit(object productId)
+    {
+        NavigationManager.NavigateTo($"/products/edit/{productId}");
+    }
+
+    private void Home()
+    {
+        NavigationManager.NavigateTo("/products");
+    }
+
+}

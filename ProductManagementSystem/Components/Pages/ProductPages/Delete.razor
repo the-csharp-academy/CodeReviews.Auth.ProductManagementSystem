@@ -1,0 +1,87 @@
+@page "/products/delete/{ProductId:int}"
+@using ProductManagementSystem.Services.Products
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Delete Product</PageTitle>
+
+<div class="row">
+    <div class="col-md-4 m-auto">
+        @if (ProductResponse is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <h1>Delete Product</h1>
+            <p class="text-muted">Are you sure you want to delete this product?</p>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">@ProductResponse.ProductName</dd>
+
+                        <dt class="col-sm-4">SKU</dt>
+                        <dd class="col-sm-8">@ProductResponse.Sku</dd>
+
+                        <dt class="col-sm-4">Category</dt>
+                        <dd class="col-sm-8">@ProductResponse.Category</dd>
+
+                        <dt class="col-sm-4">Price</dt>
+                        <dd class="col-sm-8">@ProductResponse.Price</dd>
+
+                        <dt class="col-sm-4">Quantity</dt>
+                        <dd class="col-sm-8">@ProductResponse.Quantity</dd>
+
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">@ProductResponse.Location</dd>
+
+                        <dt class="col-sm-4">Date Added</dt>
+                        <dd class="col-sm-8">@ProductResponse.DateAdded</dd>
+
+                        <dt class="col-sm-4">Is Active?</dt>
+                        <dd class="col-sm-8">@(ProductResponse.IsActive ? "Yes" : "No")</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <EditForm method="post" Model="ProductResponse" OnValidSubmit="DeleteProduct" FormName="delete" Enhance>
+                <Button Color="ButtonColor.Secondary" @onclick="Home">Cancel</Button>
+                <Button Type="ButtonType.Submit" Color="ButtonColor.Danger" Disabled="@(ProductResponse is null)">
+                    Delete
+                </Button>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? ProductId { get; set; }
+
+    private ProductResponse? ProductResponse { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductResponse = await ProductService.GetProductAsync(ProductId);
+
+        if (ProductResponse is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    private async Task DeleteProduct()
+    {
+        await ProductService.DeleteProductAsync(ProductId);
+
+        NavigationManager.NavigateTo("/products?deleted=1");
+    }
+
+    private void Home()
+    {
+        NavigationManager.NavigateTo("/products");
+    }
+
+}

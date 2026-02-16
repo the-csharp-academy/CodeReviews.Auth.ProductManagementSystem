@@ -1,0 +1,94 @@
+﻿@implements IDisposable
+
+@inject NavigationManager NavigationManager
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">
+            <img src="images/logo.png" alt="logo" class="logo"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNavCollapse"
+                aria-controls="topNavCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="topNavCollapse">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <i class="bi bi-house-door-fill"></i> Home
+                    </NavLink>
+                </li>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="/products" Match="NavLinkMatch.All">
+                                <i class="bi bi-box-seam-fill"></i> Products
+                            </NavLink>
+                        </li>
+                        @if (context.User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/employees/">
+                                    <span aria-hidden="true"><i class="bi bi-people-fill"></i></span> Employees
+                                </NavLink>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="Account/Manage">
+                                <span aria-hidden="true">
+                                    <i
+                                        class="bi bi-person-fill"></i></span> @context.User.Identity?.Name
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <form action="Account/Logout" method="post">
+                                <AntiforgeryToken/>
+                                <input type="hidden" name="ReturnUrl" value="@_currentUrl"/>
+                                <button type="submit" class="btn btn-link nav-link">
+                                    <span aria-hidden="true"><i class="bi bi-arrow-bar-left"></i></span> Logout
+                                </button>
+                            </form>
+                        </li>
+                    </Authorized>
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="Account/Register">
+                                <span aria-hidden="true"><i
+                                        class="bi bi-person-fill"></i></span> Register
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="Account/Login">
+                                <span aria-hidden="true"><i class="bi bi-person-badge-fill"></i></span> Login
+                            </NavLink>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+@code {
+    private string? _currentUrl;
+
+    protected override void OnInitialized()
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+}

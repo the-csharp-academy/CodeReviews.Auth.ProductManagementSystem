@@ -1,0 +1,147 @@
+﻿@page "/employees/edit/{UserId}"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+
+<PageTitle>Update Employee</PageTitle>
+
+<div class="row">
+    <div class="col-md-4 m-auto">
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <p class="text-danger">@_errorMessage</p>
+        }
+        else if (_isLoading)
+        {
+            <p>Loading...</p>
+        }
+        else if (_user is null)
+        {
+            <p class="text-danger">User not found.</p>
+        }
+        else
+        {
+            <h1>Update Employee</h1>
+            <div class="mb-3">
+                <div><strong>UserName:</strong> @_user.UserName</div>
+                <div><strong>Email:</strong> @_user.Email</div>
+                <div><strong>Current role(s):</strong> @string.Join(", ", _currentRoles)</div>
+            </div>
+
+            <EditForm Model="@_form" FormName="updateEmployee" OnValidSubmit="SaveAsync">
+                <DataAnnotationsValidator/>
+
+                <div class="mb-3">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" @bind="_selectedRole">
+                        <option value="">(none)</option>
+                        @foreach (var role in _allRoles)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    </select>
+                </div>
+
+                <Button Color="ButtonColor.Secondary" @onclick="Cancel" disabled="@_isSaving">Cancel</Button>
+                <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" disabled="@_isSaving">Save</Button>
+
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? UserId { get; set; }
+
+    private ApplicationUser? _user;
+    private List<string> _allRoles = new();
+    private List<string> _currentRoles = new();
+    private string? _selectedRole;
+
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private string? _errorMessage;
+
+    private RoleEditFormModel _form = new();
+
+    private sealed class RoleEditFormModel
+    {
+        public string? SelectedRole { get; set; }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(UserId))
+            {
+                _errorMessage = "Missing user id.";
+                return;
+            }
+
+            _user = await UserManager.FindByIdAsync(UserId);
+            if (_user is null)
+                return;
+
+            _allRoles = await RoleManager.Roles.Select(r => r.Name!).ToListAsync();
+            _currentRoles = (await UserManager.GetRolesAsync(_user)).ToList();
+
+            _form = new RoleEditFormModel
+            {
+                SelectedRole = _currentRoles.FirstOrDefault()
+            };
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_user is null)
+            return;
+
+        _isSaving = true;
+        _errorMessage = null;
+
+        try
+        {
+            var removeResult = await UserManager.RemoveFromRolesAsync(_user, _currentRoles);
+            if (!removeResult.Succeeded)
+                throw new InvalidOperationException(string.Join(", ", removeResult.Errors.Select(e => e.Description)));
+
+            if (!string.IsNullOrWhiteSpace(_selectedRole))
+            {
+                var addResult = await UserManager.AddToRoleAsync(_user, _selectedRole);
+                if (!addResult.Succeeded)
+                    throw new InvalidOperationException(string.Join(", ", addResult.Errors.Select(e => e.Description)));
+            }
+
+            NavigationManager.NavigateTo("/employees?updated=1");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/employees");
+    }
+
+}
