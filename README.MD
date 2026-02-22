@@ -25,6 +25,10 @@ Admin view:
 - Financial details visibility for Managers and Admins
 - Email notifications for account confirmation, password reset, and forgotten password
 - Responsive web interface built with ASP.NET Blazor
+- External auth using Google, Facebook, GitHub, Microsoft and Twitter
+
+## YouTube Video demo
+[![Product Management System](https://img.youtube.com/vi/W6wU931eC2Y/0.jpg)](https://www.youtube.com/watch?v=W6wU931eC2Y)
 
 ## Getting Started
 
