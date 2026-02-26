@@ -176,6 +176,58 @@ To enable email functionality, you need to configure the following fields:
 }
 ```
 
+### External Login Providers
+
+The application supports sign-in via **Google**, **Twitter (X)**, **GitHub**, **Facebook**, and **Microsoft**. OAuth credentials must never be stored in `appsettings.json`. Use the [.NET Secret Manager](https://learn.microsoft.com/aspnet/core/security/app-secrets) to store them securely during local development.
+
+#### 1. Initialize User Secrets
+
+Run the following command once from the repository root:
+
+```bash
+dotnet user-secrets init --project src/ProductManagementSystem.Web
+```
+
+#### 2. Obtain OAuth Credentials (Google, Twitter(X), GitHub, Facebook, Microsoft)
+
+#### 3. Store Credentials Using User Secrets
+
+**Google**
+```bash
+dotnet user-secrets set "Authentication:Google:ClientId" "your-google-client-id" --project src/ProductManagementSystem.Web
+dotnet user-secrets set "Authentication:Google:ClientSecret" "your-google-client-secret" --project src/ProductManagementSystem.Web
+```
+
+**Twitter (X)**
+```bash
+dotnet user-secrets set "Authentication:Twitter:ConsumerAPIKey" "your-twitter-api-key" --project src/ProductManagementSystem.Web
+dotnet user-secrets set "Authentication:Twitter:ConsumerSecret" "your-twitter-consumer-secret" --project src/ProductManagementSystem.Web
+```
+
+**GitHub**
+```bash
+dotnet user-secrets set "Authentication:GitHub:ClientId" "your-github-client-id" --project src/ProductManagementSystem.Web
+dotnet user-secrets set "Authentication:GitHub:ClientSecret" "your-github-client-secret" --project src/ProductManagementSystem.Web
+```
+
+**Facebook**
+```bash
+dotnet user-secrets set "Authentication:Facebook:AppId" "your-facebook-app-id" --project src/ProductManagementSystem.Web
+dotnet user-secrets set "Authentication:Facebook:AppSecret" "your-facebook-app-secret" --project src/ProductManagementSystem.Web
+```
+
+**Microsoft**
+```bash
+dotnet user-secrets set "Authentication:Microsoft:ClientId" "your-microsoft-client-id" --project src/ProductManagementSystem.Web
+dotnet user-secrets set "Authentication:Microsoft:ClientSecret" "your-microsoft-client-secret" --project src/ProductManagementSystem.Web
+```
+
+#### 4. Verify Stored Secrets
+
+```bash
+dotnet user-secrets list --project src/ProductManagementSystem.Web
+```
+
 ### Running the Application
 
 1. **Navigate to the Web project directory**
