@@ -3,6 +3,7 @@
 @inject IProductService ProductService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize(Roles = "Admin,Manager,Employee")]
 @rendermode InteractiveServer
 
 <PageTitle>Products</PageTitle>

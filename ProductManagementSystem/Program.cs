@@ -13,14 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
-    .Enrich.FromLogContext()
-    .WriteTo.MSSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true }
-    )
+    .WriteTo.Console()
     .CreateLogger();
-
-builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -86,6 +80,16 @@ using (var scope = app.Services.CreateAsyncScope())
         throw;
     }
 }
+
+var fullLogger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .WriteTo.MSSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true }
+    )
+    .WriteTo.Console()
+    .CreateLogger();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
