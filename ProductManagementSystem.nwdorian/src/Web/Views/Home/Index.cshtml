@@ -1,0 +1,135 @@
+@using Infrastructure.Authorization
+
+@{
+    ViewData["Title"] = "Home";
+    ViewData["BodyClass"] = "home-page";
+}
+
+<div class="home-hero p-4 p-md-5 mb-5">
+    <h1 class="display-5 mb-2">GamesEdge</h1>
+    <p class="lead mb-0">
+        GamesEdge keeps your game catalog in one place. Search it, keep it up to date and pick up where you
+        left off.
+    </p>
+</div>
+
+<h2 class="h4 mb-3">Where to next</h2>
+<div class="row g-4 mb-5">
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card home-card position-relative h-100">
+            <div class="card-body">
+                <i class="bi bi-collection-play fs-3 text-primary" aria-hidden="true"></i>
+                <h3 class="h5 mt-2">Browse the catalog</h3>
+                <p class="text-secondary">
+                    Search, sort and page through every game currently in the catalog.
+                </p>
+                <a class="stretched-link fw-semibold" asp-controller="Games" asp-action="Index">
+                    Open catalog
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card home-card position-relative h-100">
+            <div class="card-body">
+                <i class="bi bi-pencil-square fs-3 text-primary" aria-hidden="true"></i>
+                <h3 class="h5 mt-2">Manage games</h3>
+                <p class="text-secondary">
+                    Add new games and update or remove the existing ones.
+                </p>
+                <a class="stretched-link fw-semibold" asp-controller="Games" asp-action="Index">
+                    Manage games
+                </a>
+            </div>
+        </div>
+    </div>
+    @if (User.IsInRole(Roles.Admin))
+    {
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card home-card position-relative h-100">
+                <div class="card-body">
+                    <i class="bi bi-people-fill fs-3 text-primary" aria-hidden="true"></i>
+                    <h3 class="h5 mt-2">Staff administration</h3>
+                    <p class="text-secondary">
+                        Review the staff accounts that have access to GamesEdge.
+                    </p>
+                    <a class="stretched-link fw-semibold" asp-controller="Admin" asp-action="Index">
+                        Manage staff
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card home-card position-relative h-100">
+            <div class="card-body">
+                <i class="bi bi-shield-lock fs-3 text-primary" aria-hidden="true"></i>
+                <h3 class="h5 mt-2">Privacy</h3>
+                <p class="text-secondary">
+                    Find out what GamesEdge stores about you and how it is used.
+                </p>
+                <a class="stretched-link fw-semibold" asp-controller="Home" asp-action="Privacy">
+                    Read the policy
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="h4 mb-3">What you can do here</h2>
+<div class="row g-4 mb-5">
+    <div class="col-12 col-md-4">
+        <div class="card home-card h-100">
+            <div class="card-body">
+                <i class="bi bi-search fs-4 text-primary" aria-hidden="true"></i>
+                <h3 class="h5 mt-2">Find a game</h3>
+                <p class="text-secondary mb-0">
+                    Look games up by name, then sort by name, genre, price or release date and pick how many
+                    rows you want per page.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="card home-card h-100">
+            <div class="card-body">
+                <i class="bi bi-arrow-repeat fs-4 text-primary" aria-hidden="true"></i>
+                <h3 class="h5 mt-2">Keep it accurate</h3>
+                <p class="text-secondary mb-0">
+                    Correct a price, change a genre, update a release date or a title, all
+                    from the catalog page.
+                </p>
+            </div>
+        </div>
+    </div>
+    @if (User.IsInRole(Roles.Admin))
+    {
+        <div class="col-12 col-md-4">
+            <div class="card home-card h-100">
+                <div class="card-body">
+                    <i class="bi bi-person-plus-fill fs-4 text-primary" aria-hidden="true"></i>
+                    <h3 class="h5 mt-2">Manage staff access</h3>
+                    <p class="text-secondary mb-0">
+                        Add staff accounts, update their details and remove access for anyone who no longer
+                        needs it.
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="card mb-3">
+    <div class="card-body d-flex flex-wrap align-items-center gap-3">
+        <i class="bi bi-key-fill fs-4 text-primary" aria-hidden="true"></i>
+        <div class="me-auto">
+            <h2 class="h5 mb-1">Account</h2>
+            <p class="text-secondary mb-0">
+                Signed in as @User.Identity!.Name. Use the navigation bar above to sign out.
+            </p>
+        </div>
+        <a class="btn btn-outline-primary" asp-controller="Account" asp-action="ForgotPassword">
+            Reset password
+        </a>
+    </div>
+</div>

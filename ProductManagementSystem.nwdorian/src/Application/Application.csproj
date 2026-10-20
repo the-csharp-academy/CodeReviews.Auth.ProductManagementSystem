@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Domain\Domain.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Database\" />
+        <Folder Include="Games\Commands\" />
+        <Folder Include="Notifications\" />
+        <Folder Include="Pagination\" />
+        <Folder Include="Users\" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    </ItemGroup>
+</Project>

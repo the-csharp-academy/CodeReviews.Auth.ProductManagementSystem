@@ -1,0 +1,116 @@
+﻿@using Web.Models.Games.Extensions
+@model GamesIndex
+
+@{
+    ViewData["Title"] = "Games";
+}
+
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form class="d-flex gap-2 align-items-center" id="filters-form" asp-controller="Games" asp-action="Index"
+              method="get">
+            <button type="button" class="btn btn-primary" onclick="loadModal('Games', 'Create')">
+                Add game
+            </button>
+
+            <input id="search-input" class="form-control w-auto" type="text" name="SearchTerm"
+                   value="@Model.Filter?.SearchTerm" placeholder="Enter name" />
+            <button type="submit" class="btn btn-primary">Search</button>
+
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <label for="sort-by" class="mb-0 text-nowrap">Sort:</label>
+                <select id="sort-by" class="form-select w-auto" name="SortBy" asp-items="Model.SortBy"
+                        onchange="this.form.submit()"></select>
+                <select class="form-select w-auto" name="SortDirection" asp-items="Model.SortDirection"
+                        onchange="this.form.submit()"></select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Games[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Games[0].Genre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Games[0].Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Games[0].ReleaseDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var game in Model.Games)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(model => game.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => game.Genre)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => game.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => game.ReleaseDate)
+                </td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-outline-primary" onclick="loadModal('Games', 'Update', '@game.Id')"
+                            aria-label="Edit game">
+                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" onclick="loadModal('Games', 'Delete', '@game.Id')"
+                            aria-label="Delete game">
+                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <ul class="pagination mb-0">
+        <li class="page-item @(Model.PagingMetadata.HasPreviousPage ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-all-route-data="@Model.PagingRouteValues()"
+               asp-route-pageNumber="@(Model.PagingMetadata.PageNumber - 1)">
+                <i class="bi bi-caret-left-fill" aria-hidden="true"></i>
+            </a>
+        </li>
+        @for (var i = Model.PagingMetadata.StartPage; i <= Model.PagingMetadata.EndPage; i++)
+        {
+            <li class="page-item @(i == Model.PagingMetadata.PageNumber ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-all-route-data="@Model.PagingRouteValues()"
+                   asp-route-pageNumber="@i">
+                    @i
+                </a>
+            </li>
+        }
+        <li class="page-item @(Model.PagingMetadata.HasNextPage ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-all-route-data="@Model.PagingRouteValues()"
+               asp-route-pageNumber="@(Model.PagingMetadata.PageNumber + 1)">
+                <i class="bi bi-caret-right-fill" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+    <div class="d-flex align-items-center gap-2">
+        <label for="page-size-dropdown" class="mb-0 text-nowrap">Page size:</label>
+        <select class="form-select" id="page-size-dropdown" form="filters-form" name="PageSize"
+                asp-items="Model.PageSizes" onchange="document.getElementById('filters-form').submit()">
+        </select>
+    </div>
+</div>
+
+<div id="modal-placeholder"></div>
+
+@section Scripts {
+    <script src="~/js/modalManager.js"></script>
+}

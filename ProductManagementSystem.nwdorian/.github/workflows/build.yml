@@ -1,0 +1,29 @@
+name: Build
+
+on:
+    pull_request:
+        branches: [main]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Restore tools
+              run: dotnet tool restore
+
+            - name: Check Formatting
+              run: dotnet csharpier check .
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: "10.0.x"
+
+            - name: Restore
+              run: dotnet restore
+
+            - name: Build
+              run: dotnet build --no-restore

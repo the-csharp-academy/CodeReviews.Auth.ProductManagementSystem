@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <ItemGroup>
+        <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Constants\" />
+        <Folder Include="Extensions\" />
+        <Folder Include="Models\Admin\" />
+        <Folder Include="Models\Games\" />
+        <Folder Include="Models\Games\Extensions\" />
+        <Folder Include="Models\Games\Items\" />
+        <Folder Include="Models\Games\Requests\" />
+        <Folder Include="Models\Shared\" />
+        <Folder Include="Models\Staff\" />
+        <Folder Include="Models\Staff\Items\" />
+        <Folder Include="Models\Users\" />
+        <Folder Include="Views\Account\" />
+        <Folder Include="Views\Admin\" />
+        <Folder Include="Views\Games\" />
+        <Folder Include="Views\Staff\" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+        <PackageReference Include="Serilog.AspNetCore" />
+        <PackageReference Include="Serilog.Sinks.Console" />
+        <PackageReference Include="Serilog.Sinks.Seq" />
+    </ItemGroup>
+</Project>

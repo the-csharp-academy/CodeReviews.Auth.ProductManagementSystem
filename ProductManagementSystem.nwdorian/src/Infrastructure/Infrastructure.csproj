@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Application\Application.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MailKit" />
+        <PackageReference Include="Microsoft.AspNetCore.Http" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Authentication\" />
+        <Folder Include="Authorization\" />
+        <Folder Include="Database\" />
+        <Folder Include="Database\Interceptors\" />
+        <Folder Include="Emails\" />
+        <Folder Include="Games\" />
+        <Folder Include="Notifications\" />
+        <Folder Include="Time\" />
+        <Folder Include="Users\" />
+    </ItemGroup>
+</Project>

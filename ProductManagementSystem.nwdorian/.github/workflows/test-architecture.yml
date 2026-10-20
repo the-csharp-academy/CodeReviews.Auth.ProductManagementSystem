@@ -1,0 +1,21 @@
+name: Architecture Tests
+
+on:
+    pull_request:
+        branches: [main]
+
+jobs:
+    architecture-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: "10.0.x"
+            - name: Restore
+              run: dotnet restore tests/ArchitectureTests/ArchitectureTests.csproj
+            - name: Build
+              run: dotnet build tests/ArchitectureTests/ArchitectureTests.csproj --no-restore
+            - name: Run Architecture Tests
+              run: dotnet test tests/ArchitectureTests/ArchitectureTests.csproj --no-build

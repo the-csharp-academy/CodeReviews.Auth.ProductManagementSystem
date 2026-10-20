@@ -1,0 +1,44 @@
+services:
+  gamesedge.web:
+    container_name: gamesedge.web
+    build:
+      context: .
+      dockerfile: src/Web/Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      gamesedge.database:
+        condition: service_healthy
+    
+  gamesedge.database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: gamesedge.database
+    environment:
+      - MSSQL_SA_PASSWORD=Password123
+      - ACCEPT_EULA=Y
+    ports:
+      - 1433:1433
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x sqlservr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  gamesedge.email:
+    image: axllent/mailpit:latest
+    container_name: gamesedge.mailpit
+    restart: unless-stopped
+    ports:
+      - 8025:8025
+      - 1025:1025
+  
+  gamesedge.seq:
+    image: datalust/seq:latest
+    container_name: gamesedge.seq
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=True
+    ports:
+      - 5341:5341
+      - 8081:80

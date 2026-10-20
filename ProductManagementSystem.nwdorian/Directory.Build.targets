@@ -1,0 +1,6 @@
+<Project>
+    <ItemGroup>
+        <PackageReference Include="SonarAnalyzer.CSharp" PrivateAssets="all" />
+        <PackageReference Include="IDisposableAnalyzers" PrivateAssets="all" />
+    </ItemGroup>
+</Project>

@@ -1,0 +1,63 @@
+﻿@model AdminIndex
+
+@{
+    ViewData["Title"] = "Admin Page";
+}
+
+<h1>Admin area</h1>
+
+<h2>Staff</h2>
+
+<table class="table py-3">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Staff[0].FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Staff[0].LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Staff[0].Email)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var staff in Model.Staff)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(model => staff.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => staff.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => staff.Email)
+                </td>
+
+                <td class="text-end">
+                    <button type="button" class="btn btn-outline-primary"
+                            onclick="loadModal('Staff', 'Update', '@staff.Id')" aria-label="Edit staff">
+                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary"
+                            onclick="loadModal('Staff', 'Delete', '@staff.Id')" aria-label="Delete staff">
+                        <i class="bi bi-trash3" aria-hidden="true"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button type="button" class="btn btn-primary" onclick="loadModal('Staff', 'Create')">
+    Add staff
+</button>
+
+<div id="modal-placeholder"></div>
+
+@section Scripts {
+    <script src="~/js/modalManager.js"></script>
+}
